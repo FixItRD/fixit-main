@@ -1,4 +1,5 @@
 ﻿using fixit_main.Models;
+using fixit_main.Models.Templates;
 using Microsoft.EntityFrameworkCore;
 
 namespace fixit_main

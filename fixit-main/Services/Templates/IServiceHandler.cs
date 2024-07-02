@@ -3,5 +3,6 @@
     public interface IServiceHandler
     {
         IHashingService _hashingService { get; }
+        IAuthService _authService { get; }
     }
 }

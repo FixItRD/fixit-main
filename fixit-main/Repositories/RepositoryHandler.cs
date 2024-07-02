@@ -9,8 +9,7 @@ namespace fixit_main.Repositories
 
         public RepositoryHandler(FixItDBContext context, HttpClient httpClient)
         {
-            _authRepository = new AuthRepository(context, httpClient);
-            _userRepository = new UserRepository();
+            _userRepository = new UserRepository(context);
         }
     }
 }

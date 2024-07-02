@@ -18,6 +18,7 @@ namespace fixit_main
             HttpClient client = new HttpClient();
             FixItDBContext fixItDbContext = new FixItDBContext(builder.Configuration.GetConnectionString("MainConnection"));
             IRepositoryHandler repositoryHandler = new RepositoryHandler(fixItDbContext, client);
+            IServiceHandler serviceHandler = new ServiceHandler(repositoryHandler, client);
 
             // Configuraciones
             builder.Services.ConfigureCORS("_MyAllowSpecifiOrigins");

@@ -1,10 +1,6 @@
 ﻿using fixit_main.Models;
-using fixit_main.Repositories.Templates;
 using fixit_main.Services.Templates;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace fixit_main.Controllers
 {
@@ -12,29 +8,25 @@ namespace fixit_main.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly FixItDBContext _dbContext;
         private readonly ILogger<AuthController> _logger;
         private readonly IServiceHandler _serviceHandler;
-        private readonly IRepositoryHandler _repositoryHandler;
 
-        public AuthController(ILogger<AuthController> logger, FixItDBContext dbContext, IServiceHandler serviceHandler, IRepositoryHandler repositoryHandler)
+        public AuthController(ILogger<AuthController> logger, IServiceHandler serviceHandler)
         {
             _logger = logger;
-            _dbContext = dbContext;
             _serviceHandler = serviceHandler;
-            _repositoryHandler = repositoryHandler;
         }
 
         [HttpPost("Login")]
-        public string Login(LogInParameters parameters)
+        public Task<LoginResponse> Login(LogInParameters parameters)
         {
-            return _repositoryHandler._authRepository.IsValidClient(parameters).Result.ToString();
+            return _serviceHandler._authService.LoginUser<Cliente>(parameters);
         }
 
         [HttpPost("Register")]
-        public string Register(RegisterParameters parameters)
+        public Task<RegisterResponse> Register(RegisterParameters parameters)
         {
-            return _repositoryHandler._authRepository.RegisterClient(parameters).Result.ToString();
+            return _serviceHandler._authService.RegisterUser<Trabajador>(parameters);
         }
     }
 }

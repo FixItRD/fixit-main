@@ -53,7 +53,7 @@ namespace fixit_main
 
                 options.AddPolicy("--IsClient", policy =>
                 {
-                    policy.RequireRole(new string[] { "cliente" });
+                    policy.RequireRole(new string[] { "client" });
                 });
 
                 options.AddPolicy("--IsWorker", policy =>
