@@ -1,4 +1,9 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using fixit_main.Repositories.Templates;
+using fixit_main.Repositories;
+using fixit_main.Services.Templates;
+using fixit_main.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
@@ -9,7 +14,7 @@ namespace fixit_main
     {
         public static void ConfigureCORS(this IServiceCollection services, string MyAllowSpecifiOrigins)
         {
-            string[] domains = { "", "https://localhost:44311", "http://localhost:32777", "https://localhost:32778", "http://localhost:32779" };
+            string[] domains = { "", "https://localhost:7242", "http://localhost:32777", "https://localhost:32778", "http://localhost:32779" };
 
 
             services.AddCors(options =>
@@ -60,6 +65,11 @@ namespace fixit_main
                 {
                     policy.RequireRole(new string[] { "worker" });
                 });
+
+                options.AddPolicy("--IsBoth", policy =>
+                {
+                    policy.RequireRole(new string[] { "worker", "client" });
+                });
             });
         }
 
@@ -92,6 +102,42 @@ namespace fixit_main
                     }
                 });
             });
+        }
+
+        public static void ConfigureDbContext(this IServiceCollection services, IConfiguration configuration)
+        {
+            services
+                .AddDbContextPool<FixItDBContext>(opt => opt.UseSqlServer(configuration.GetConnectionString("MainConnection")));
+        }
+
+        public static void ConfigureGraphQl(this IServiceCollection services)
+        {
+            services
+                .AddGraphQLServer()
+                .AddTypes()
+                .AddFiltering()
+                .AddSorting()
+                .AddAuthorization()
+                .RegisterDbContext<FixItDBContext>();
+        }
+
+        public static void InjectServices(this IServiceCollection services)
+        {
+            services.AddScoped<HttpClient>();
+            services.AddScoped<IRepositoryHandler, RepositoryHandler>();
+            services.AddScoped<IServiceHandler, ServiceHandler>();
+        }
+
+        public static void ConfigureApp(this WebApplication app)
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI();
+            
+            app.MapGraphQL("/api/graph");
+            app.UseAuthentication();
+            app.UseAuthorization();
+            app.MapControllers();
+            app.Run();
         }
     }
 }

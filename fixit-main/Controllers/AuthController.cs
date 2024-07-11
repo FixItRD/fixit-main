@@ -20,13 +20,23 @@ namespace fixit_main.Controllers
         [HttpPost("Login")]
         public Task<LoginResponse> Login(LogInParameters parameters)
         {
-            return _serviceHandler._authService.LoginUser<Cliente>(parameters);
+            if (parameters.Role == "client")
+                return _serviceHandler._authService.LoginUser<Cliente>(parameters);
+            else if (parameters.Role == "worker")
+                return _serviceHandler._authService.LoginUser<Trabajador>(parameters);
+            else
+                return Task.Run(() => new LoginResponse(4, "Invalid role"));
         }
 
         [HttpPost("Register")]
         public Task<RegisterResponse> Register(RegisterParameters parameters)
         {
-            return _serviceHandler._authService.RegisterUser<Trabajador>(parameters);
+            if (parameters.Role == "client")
+                return _serviceHandler._authService.RegisterUser<Cliente>(parameters);
+            else if (parameters.Role == "worker")
+                return _serviceHandler._authService.RegisterUser<Trabajador>(parameters);
+            else
+                return Task.Run(() => new RegisterResponse(4, "Invalid role"));
         }
     }
 }

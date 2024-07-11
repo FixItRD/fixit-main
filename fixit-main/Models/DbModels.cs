@@ -71,16 +71,19 @@ namespace fixit_main.Models
 
         [Required]
         [ForeignKey("Cliente")]
+        [Column("Cliente")]
         public int ClienteId { get; set; }
         public Cliente Cliente { get; set; }
 
         [Required]
         [ForeignKey("Trabajador")]
+        [Column("Trabajador")]
         public int TrabajadorId { get; set; }
         public Trabajador Trabajador { get; set; }
 
         [Required]
         [ForeignKey("CategoriaServicio")]
+        [Column("Categoria_servicio")]
         public int Categoria_ServicioId { get; set; }
         public CategoriaServicio CategoriaServicio { get; set; }
 
@@ -89,6 +92,7 @@ namespace fixit_main.Models
         public Calificacion Calificacion { get; set; }
 
         [Required]
+        public int ID_Factura { get; set; }
         public Factura Factura { get; set; }
     }
 
@@ -159,6 +163,7 @@ namespace fixit_main.Models
 
         [Required]
         [StringLength(100)]
+        [Column("Área")]
         public string Area { get; set; }
 
         [Required]
@@ -170,6 +175,7 @@ namespace fixit_main.Models
         public bool Validado { get; set; }
     }
 
+    [Table("Trabajador_servicio")]
     [PrimaryKey("ID_Servicio", "ID_Trabajador")]
     public class TrabajadorServicio
     {
@@ -184,6 +190,7 @@ namespace fixit_main.Models
         public Trabajador Trabajador { get; set; }
     }
 
+    [Table("Categoria_servicio")]
     public class CategoriaServicio
     {
         [Key]

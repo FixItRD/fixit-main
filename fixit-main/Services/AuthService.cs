@@ -40,7 +40,7 @@ namespace fixit_main.Services
                     {
                         string role = typeof(T) == typeof(Cliente) ? "client" : "worker";
 
-                        string token = _httpClient.PostAsJsonAsync("https://localhost:32776/api/v1/Token", new UserClaimsModel()
+                        string token = _httpClient.PostAsJsonAsync("https://fixit-token-handler20240711122232.azurewebsites.net/api/v1/Token", new UserClaimsModel()
                         {
                             UserId = currentUser.ID,
                             Name = currentUser.Nombre,
@@ -87,7 +87,7 @@ namespace fixit_main.Services
                         T currentUser = (T)_repositoryHandler._userRepository.ReadUserAsync<T>(registerParameters.Email).Result.Items[0];
                         string role = typeof(T) == typeof(Cliente) ? "client" : "worker";
 
-                        string token = _httpClient.PostAsJsonAsync("https://localhost:32776/api/v1/Token", new UserClaimsModel()
+                        string token = _httpClient.PostAsJsonAsync("https://fixit-token-handler20240711122232.azurewebsites.net/api/v1/Token", new UserClaimsModel()
                         {
                             UserId = currentUser.ID,
                             Name = currentUser.Nombre,

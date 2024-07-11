@@ -6,7 +6,10 @@ namespace fixit_main
 {
     public class FixItDBContext : DbContext
     {
-        private readonly string connectionString;
+        public FixItDBContext(DbContextOptions<FixItDBContext> options) : base(options)
+        {
+        }
+
         public DbSet<Cliente> Cliente { get; set; }
         public DbSet<Ubicacion> Ubicacion { get; set; }
         public DbSet<Servicio> Servicio { get; set; }
@@ -16,15 +19,5 @@ namespace fixit_main
         public DbSet<CategoriaServicio> CategoriaServicio { get; set; }
         public DbSet<TrabajadorServicio> TrabajadorServicio { get; set; }
         public DbSet<Calificacion> Calificacion { get; set; }
-
-        public FixItDBContext(string connectionString)
-        {
-            this.connectionString = connectionString;
-        }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer(connectionString);
-        }
     }
 }
