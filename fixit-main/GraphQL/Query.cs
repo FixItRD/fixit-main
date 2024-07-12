@@ -101,6 +101,15 @@ namespace fixit_main.GraphQL
             int id = Convert.ToInt32(claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier)?.Value);
             return context.Servicio.Where(s => s.Cliente.ID == id);
         }
+        [Authorize(Policy = "--IsClient")]
+        [UseOffsetPaging]
+        [UseFiltering]
+        [UseSorting]
+        public static IQueryable<Calificacion> GetCalificacions(FixItDBContext context, ClaimsPrincipal claimsPrincipal)
+        {
+            int id = Convert.ToInt32(claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            return context.Calificacion.Where(s => s.Servicio.Cliente.ID == id);
+        }
 
 
     }
