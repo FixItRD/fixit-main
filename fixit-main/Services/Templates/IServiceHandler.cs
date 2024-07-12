@@ -4,5 +4,6 @@
     {
         IHashingService _hashingService { get; }
         IAuthService _authService { get; }
+        ITokenService _tokenService { get; }
     }
 }

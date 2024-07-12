@@ -1,4 +1,5 @@
-﻿using fixit_main.Models;
+﻿using System.Security.Claims;
+using fixit_main.Models;
 using HotChocolate.Authorization;
 using Microsoft.EntityFrameworkCore;
 
@@ -67,5 +68,20 @@ namespace fixit_main.GraphQL
         [UseFiltering]
         [UseSorting]
         public static IQueryable<Factura> GetFacturas(FixItDBContext context) => context.Factura;
+
+        [Authorize(Policy = "--IsWorker")]
+        [UseOffsetPaging]
+        [UseFiltering]
+        [UseSorting]
+        public static IQueryable<Servicio> GetAvailiableServices(FixItDBContext context, ClaimsPrincipal claimsPrincipal)
+        {
+            int id = Convert.ToInt32(claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            var worker = context.Trabajador.Find(id);
+            // Get all services that are not assigned to any worker and that are in the same category as the worker and that are in the availability of the worker
+            return context
+            .Servicio
+            .Where(servicio => servicio.Trabajador.Email == "defaultworker@mail.co")
+            .Where(servicio => worker.TrabajadorServicios.Any(e => e.Servicio.CategoriaServicio.ID_Servicio == servicio.CategoriaServicio.ID_Servicio));
+        }
     }
 }

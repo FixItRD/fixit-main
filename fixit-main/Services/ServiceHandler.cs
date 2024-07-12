@@ -9,11 +9,13 @@ namespace fixit_main.Services
         public IHashingService _hashingService { get; }
 
         public IAuthService _authService { get; }
+        public ITokenService _tokenService { get; }
 
         public ServiceHandler(IRepositoryHandler repositoryHandler, HttpClient httpClient)
         {
             _hashingService = new HashingService();
             _authService = new AuthService(repositoryHandler, _hashingService, httpClient);
+            _tokenService = new TokenService(httpClient);
         }
     }
 }

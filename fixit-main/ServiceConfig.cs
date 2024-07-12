@@ -118,6 +118,7 @@ namespace fixit_main
                 .AddFiltering()
                 .AddSorting()
                 .AddAuthorization()
+                .AddMutationConventions()
                 .RegisterDbContext<FixItDBContext>();
         }
 

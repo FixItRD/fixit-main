@@ -62,7 +62,7 @@ namespace fixit_main.Models
 
         public DateTime Fecha_Realizacion { get; set; } = DateTime.Now;
 
-        public DateTime Fecha_Completado { get; set; } = DateTime.Parse("0001-01-01 00:00:00");
+        public DateTime? Fecha_Completado { get; set; } = DateTime.Parse("0001-01-01 00:00:00");
 
         [StringLength(50)]
         public string Estado { get; set; } = "pendiente";
