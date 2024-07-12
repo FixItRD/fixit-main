@@ -108,7 +108,7 @@ namespace fixit_main.GraphQL
         }
 
         [Authorize(Policy = "--IsClient")]
-        public async Task<MutationResult> UpdateClientProfile(FixItDBContext context, [Service] IServiceHandler serviceHandler, string name, string phone, ClaimsPrincipal claimsPrincipal)
+        public async Task<MutationResult> UpdateClientProfile(FixItDBContext context,  string name, string phone, ClaimsPrincipal claimsPrincipal)
         {
             try
             {
@@ -127,6 +127,31 @@ namespace fixit_main.GraphQL
                 return new MutationResult { Success = false, Message = "An error occurred" };
             }
         }
+        [Authorize(Policy = "--IsClient")]
+        public async Task<MutationResult> UpdateClientLocation(FixItDBContext context, int locationId,string address, string detail, ClaimsPrincipal claimsPrincipal)
+        {
+            try
+            {
+                _ = int.TryParse(claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier)?.Value, out int id);
+                var client = context.Cliente.Where(e => e.ID == id).FirstOrDefault();
+                if (client == null)
+                    return new MutationResult { Success = false, Message = "Client not found" };
+                var location = context.Ubicacion.Where(e => e.ID_Ubicacion == locationId).FirstOrDefault();
+                if (location == null)
+                    return new MutationResult { Success = false, Message = "Location not found" };
+                location.Direccion = address;
+                location.Detalle = detail;
+                await context.SaveChangesAsync();
+                return new MutationResult { Success = true, Message = "Location updated successfully" };
+             
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return new MutationResult { Success = false, Message = "An error occurred" };
+            }
+        }
+
         [Authorize(Policy = "--IsWorker")]
         public async Task<MutationResult> UpdateWorkerProfile(FixItDBContext context, [Service] IServiceHandler serviceHandler, string name, string phone, ClaimsPrincipal claimsPrincipal)
         {
@@ -291,11 +316,8 @@ namespace fixit_main.GraphQL
             try
             {
                 var client = context.Cliente.Where(e => e.Email == email).FirstOrDefault();
-                var locationExists = context.Ubicacion.Where(e => e.Direccion == address && e.ID_Cliente == client.ID).FirstOrDefault() != null;
                 if (client == null)
                     return new MutationResult { Success = false, Message = "Client not found" };
-                if (locationExists)
-                    return new MutationResult { Success = false, Message = "Location already exists" };
                 Ubicacion ubicacion = new() { Direccion = address, Detalle = detail, ID_Cliente = client.ID };
                 await context.Ubicacion.AddAsync(ubicacion);
                 await context.SaveChangesAsync();
