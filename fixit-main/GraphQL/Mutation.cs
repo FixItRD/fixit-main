@@ -108,7 +108,7 @@ namespace fixit_main.GraphQL
         }
 
         [Authorize(Policy = "--IsClient")]
-        public async Task<MutationResult> UpdateClientProfile(FixItDBContext context,  string name, string phone, ClaimsPrincipal claimsPrincipal)
+        public async Task<MutationResult> UpdateClientProfile(FixItDBContext context, string name, string phone, ClaimsPrincipal claimsPrincipal)
         {
             try
             {
@@ -128,7 +128,7 @@ namespace fixit_main.GraphQL
             }
         }
         [Authorize(Policy = "--IsClient")]
-        public async Task<MutationResult> UpdateClientLocation(FixItDBContext context, int locationId,string address, string detail, ClaimsPrincipal claimsPrincipal)
+        public async Task<MutationResult> UpdateClientLocation(FixItDBContext context, int locationId, string address, string detail, ClaimsPrincipal claimsPrincipal)
         {
             try
             {
@@ -143,7 +143,7 @@ namespace fixit_main.GraphQL
                 location.Detalle = detail;
                 await context.SaveChangesAsync();
                 return new MutationResult { Success = true, Message = "Location updated successfully" };
-             
+
             }
             catch (Exception ex)
             {
@@ -368,6 +368,64 @@ namespace fixit_main.GraphQL
             }
 
         }
+        [Authorize(Policy = "--IsClient")]
+        public async Task<MutationResult> AddServiceRating(FixItDBContext context, int serviceId, int rating, string comment, ClaimsPrincipal claimsPrincipal)
+        {
+            try
+            {
+                _ = int.TryParse(claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier)?.Value, out int id);
+                var client = context.Cliente.Where(e => e.ID == id).FirstOrDefault();
+                if (client == null)
+                    return new MutationResult { Success = false, Message = "Client not found" };
+                var service = context.Servicio.Where(e => e.ID_Servicio == serviceId).FirstOrDefault();
+                if (service == null)
+                    return new MutationResult { Success = false, Message = "Service not found" };
+                if (service.ClienteId != client.ID)
+                    return new MutationResult { Success = false, Message = "Service not available" };
+                if (service.Estado != "completado")
+                    return new MutationResult { Success = false, Message = "Service not completed" };
+                if (service.ID_Calificacion != -1)
+                    return new MutationResult { Success = false, Message = "Service already rated" };
+                Calificacion calificacion = new() { Comentario = comment, Puntuacion = rating };
+                await context.Calificacion.AddAsync(calificacion);
+                service.ID_Calificacion = calificacion.ID_Calificacion;
+                await context.SaveChangesAsync();
+                return new MutationResult { Success = true, Message = "Service rated successfully" };
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return new MutationResult { Success = false, Message = "An error occurred" };
+            }
+        }
+        [Authorize(Policy = "--IsClient")]
+        public async Task<MutationResult> PayService(FixItDBContext context, int serviceId, ClaimsPrincipal claimsPrincipal)
+        {
+            try
+            {
+                _ = int.TryParse(claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier)?.Value, out int id);
+                var client = context.Cliente.Where(e => e.ID == id).FirstOrDefault();
+                if (client == null)
+                    return new MutationResult { Success = false, Message = "Client not found" };
+                var service = context.Servicio.Where(e => e.ID_Servicio == serviceId).FirstOrDefault();
+                if (service == null)
+                    return new MutationResult { Success = false, Message = "Service not found" };
+                if (service.ClienteId != client.ID)
+                    return new MutationResult { Success = false, Message = "Service not available" };
+                if (service.Factura.Estado_Pago == "pagado")
+                    return new MutationResult { Success = false, Message = "Service already paid" };
+                service.Factura.Estado_Pago = "pagado";
+                await context.SaveChangesAsync();
+                return new MutationResult { Success = true, Message = "Service paid successfully" };
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return new MutationResult { Success = false, Message = "An error occurred" };
+            }
+
+        }
+
         [Authorize(Policy = "--IsWorker")]
         public async Task<MutationResult> TakeService(FixItDBContext context, int serviceId, ClaimsPrincipal claimsPrincipal)
         {
