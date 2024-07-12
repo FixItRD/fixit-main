@@ -41,6 +41,12 @@ namespace fixit_main.GraphQL
         public bool Success { get; set; }
         public string Message { get; set; }
     }
+    public class MutationResultWithID
+    {
+        public bool Success { get; set; }
+        public string Message { get; set; }
+        public int ID { get; set; }
+    }
 
     [MutationType]
     public class Mutation
@@ -330,20 +336,20 @@ namespace fixit_main.GraphQL
             }
         }
         [Authorize(Policy = "--IsClient")]
-        public async Task<MutationResult> RequestService(FixItDBContext context, RequestServiceParameters parameters, ClaimsPrincipal claimsPrincipal)
+        public async Task<MutationResultWithID> RequestService(FixItDBContext context, RequestServiceParameters parameters, ClaimsPrincipal claimsPrincipal)
         {
             try
             {
                 _ = int.TryParse(claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier)?.Value, out int id);
                 var client = context.Cliente.Where(e => e.ID == id).FirstOrDefault();
                 if (client == null)
-                    return new MutationResult { Success = false, Message = "Client not found" };
+                    return new MutationResultWithID { Success = false, Message = "Client not found" };
                 var category = context.CategoriaServicio.Where(e => e.ID_Servicio == parameters.Categoria_ServicioId).FirstOrDefault();
                 if (category == null)
-                    return new MutationResult { Success = false, Message = "Category not found" };
+                    return new MutationResultWithID { Success = false, Message = "Category not found" };
                 var defaultWorker = context.Trabajador.Where(e => e.Email == "defaultworker@mail.co").FirstOrDefault();
                 if (defaultWorker == null)
-                    return new MutationResult { Success = false, Message = "Default worker not found" };
+                    return new MutationResultWithID { Success = false, Message = "Default worker not found" };
                 Servicio servicio = new()
                 {
                     ClienteId = client.ID,
@@ -359,12 +365,12 @@ namespace fixit_main.GraphQL
                 };
                 await context.Servicio.AddAsync(servicio);
                 await context.SaveChangesAsync();
-                return new MutationResult { Success = true, Message = "Service requested successfully" };
+                return new MutationResultWithID { Success = true, Message = "Service requested successfully", ID = servicio.ID_Servicio };
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                return new MutationResult { Success = false, Message = "An error occurred" };
+                return new MutationResultWithID { Success = false, Message = "An error occurred" };
             }
 
         }
