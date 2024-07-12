@@ -83,5 +83,16 @@ namespace fixit_main.GraphQL
             .Where(servicio => servicio.Trabajador.Email == "defaultworker@mail.co")
             .Where(servicio => worker.TrabajadorServicios.Any(e => e.Servicio.CategoriaServicio.ID_Servicio == servicio.CategoriaServicio.ID_Servicio));
         }
+        [Authorize(Policy = "--IsClient")]
+        [UseOffsetPaging]
+        [UseFiltering]
+        [UseSorting]
+        public static IQueryable<Ubicacion> GetClientLocations(FixItDBContext context, ClaimsPrincipal claimsPrincipal)
+        {
+            int id = Convert.ToInt32(claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            return context.Ubicacion.Where(ubicacion => ubicacion.Cliente.ID == id);
+        }
+
+
     }
 }
