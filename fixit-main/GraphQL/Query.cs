@@ -54,7 +54,6 @@ namespace fixit_main.GraphQL
         [UseOffsetPaging]
         [UseFiltering]
         [UseSorting]
-        [Authorize]
         public static IQueryable<CategoriaServicio> GetCategoriasServicios(FixItDBContext context) => context.CategoriaServicio;
         [UseOffsetPaging]
         [UseFiltering]
